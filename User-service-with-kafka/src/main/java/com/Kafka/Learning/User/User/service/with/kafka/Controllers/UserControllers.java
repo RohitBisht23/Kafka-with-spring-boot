@@ -3,6 +3,7 @@ package com.Kafka.Learning.User.User.service.with.kafka.Controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,9 @@ public class UserControllers {
     //Kafka template
     private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @Value("${kafka.topic.user_random_topic}")
+    private  String KAFKA_RANDOM_USER_TOPIC;
+
     public UserControllers(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
@@ -25,7 +29,9 @@ public class UserControllers {
     @PostMapping("/{message}")
     public ResponseEntity<String> sendMessage(@PathVariable String message) {
 
-        kafkaTemplate.send("user-random-topic", message);
+        for(int i=0; i<1000; i++) {
+            kafkaTemplate.send(KAFKA_RANDOM_USER_TOPIC, message+" "+i);
+        }
 
         return ResponseEntity.ok("Message received");
     }
